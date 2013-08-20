@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Text sizes -->
+    <dimen name="text_nano">10sp</dimen>
+    <dimen name="text_micro">12sp</dimen>
+    <dimen name="text_small">14sp</dimen>
+    <dimen name="text_medium">18sp</dimen>
+    <dimen name="text_large">22sp</dimen>
+    <dimen name="text_huge">45sp</dimen>
+
+    <!-- Typical padding dimensions -->
+    <dimen name="micro">1dp</dimen>
+    <dimen name="half_tiny">2dp</dimen>
+    <dimen name="tiny">4dp</dimen>
+    <dimen name="small">8dp</dimen>
+    <dimen name="normal">16dp</dimen>
+    <dimen name="large">32dp</dimen>
+    <dimen name="double_large">64dp</dimen>
+    <dimen name="none">0dp</dimen>
+
+    <!-- Images -->
+    <dimen name="wide_v_height">80dp</dimen>
+    <dimen name="wide_v_width">60dp</dimen>
+
+</resources>

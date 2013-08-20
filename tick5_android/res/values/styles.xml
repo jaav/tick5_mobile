@@ -1,0 +1,15 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="AppBaseTheme" parent="Theme.Sherlock.Light.DarkActionBar">
+        <item name="actionBarStyle">@style/AppTheme.ActionBarStyle</item>
+    </style>
+
+    <style name="AppTheme.ActionBarStyle" parent="Widget.Sherlock.Light.ActionBar.Solid.Inverse"></style>
+
+    <style name="AppTheme" parent="AppBaseTheme"></style>
+
+    <style name="AppTheme.HoloSpinner" parent="@style/Widget.Sherlock.Light.Spinner.DropDown.ActionBar">
+        <item name="android:background">@drawable/spinner_background_holo</item>
+    </style>
+
+</resources>
