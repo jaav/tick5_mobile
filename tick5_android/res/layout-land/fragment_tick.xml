@@ -24,7 +24,8 @@
         android:linksClickable="true"
         android:paddingLeft="@dimen/normal"
         android:paddingRight="@dimen/normal"
-        android:textColor="@android:color/white" />
+        android:textColor="@android:color/white"
+        android:textColorLink="@android:color/white" />
 
     <LinearLayout
         android:id="@+id/links_container"
@@ -45,6 +46,8 @@
         android:layout_alignParentRight="true"
         android:layout_marginBottom="@dimen/normal"
         android:layout_marginRight="@dimen/normal"
-        android:background="@drawable/text_background" />
+        android:background="@drawable/text_background"
+        android:textColor="@android:color/white"
+        android:textColorLink="@android:color/white" />
 
 </RelativeLayout>

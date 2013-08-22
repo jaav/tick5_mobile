@@ -1,5 +1,10 @@
 package be.virtualsushi.tick5;
 
+import org.acra.ACRA;
+import org.acra.ReportField;
+import org.acra.ReportingInteractionMode;
+import org.acra.annotation.ReportsCrashes;
+
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.graphics.Typeface;
@@ -13,6 +18,8 @@ import be.virtualsushi.tick5.roboto.RobotoTypefaces;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
+@ReportsCrashes(formKey = "", mode = ReportingInteractionMode.DIALOG, mailTo = "pavel@pavel.st", resDialogText = R.string.crash_dialog_text, resDialogIcon = android.R.drawable.ic_dialog_info, resDialogTitle = R.string.crash_dialog_title, resDialogCommentPrompt = R.string.crash_dialog_comment_prompt, resDialogOkToast = R.string.crash_dialog_ok_toast, customReportContent = {
+		ReportField.USER_COMMENT, ReportField.ANDROID_VERSION, ReportField.PACKAGE_NAME, ReportField.STACK_TRACE, ReportField.APP_VERSION_NAME })
 public class Tick5Application extends Application implements RobotoTypefaceProvider, RequestQueueProvider, ImageManagerProvider {
 
 	public static final String TICK5_PREFERENCES = "tick5_preferences";
@@ -28,6 +35,7 @@ public class Tick5Application extends Application implements RobotoTypefaceProvi
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		ACRA.init(this);
 		mRobotoTypefaces = new SparseArray<Typeface>(RobotoTypefaces.values().length);
 		mRequestQueue = Volley.newRequestQueue(this);
 		mImageManager = new ImageManager(this);

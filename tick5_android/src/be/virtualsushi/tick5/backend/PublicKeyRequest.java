@@ -11,7 +11,7 @@ public class PublicKeyRequest extends StringRequest {
 	private static final String KEY_END_PHRASE = "';";
 
 	public PublicKeyRequest(Listener<String> listener, ErrorListener errorListener) {
-		super(Method.GET, PUBLIC_KEY_URL, listener, errorListener);
+		super(Method.GET, PUBLIC_KEY_URL + "?" + System.currentTimeMillis(), listener, errorListener);
 		setShouldCache(false);
 	}
 

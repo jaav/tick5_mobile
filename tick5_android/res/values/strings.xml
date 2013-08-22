@@ -4,6 +4,12 @@
     <string name="image">image</string>
     <string name="load_error">Error loading ticks data. Check your network connection.</string>
 
+    <!-- Crash dialog -->
+    <string name="crash_dialog_text">An unexpected error occurred forcing the application to stop. Please help us fix this by sending us error data, all you have to do is click OK.</string>
+    <string name="crash_dialog_title">Tick5 crashed</string>
+    <string name="crash_dialog_comment_prompt">You might add your comments about the problem below:</string>
+    <string name="crash_dialog_ok_toast">Report sent</string>
+
     <string-array name="filters">
         <item>cartoon</item>
         <item>vintage2</item>
@@ -11,14 +17,15 @@
         <item>nightvision</item>
         <item>squared</item>
     </string-array>
-        <string name="menu">Menu</string>
-        <string name="refresh">Refresh</string>
-        <string name="settings">Settings</string>
-        <string name="about">About</string>
-        <string name="select_default_filter">Select default filter</string>
-        <string name="tick5_settings">Tick5 Settings</string>
-        <string name="accept">Accept</string>
-        <string name="about_sample">Some info text need to be placed here.</string>
-        <string name="about_tick5">About Tick5</string>
+
+    <string name="menu">Menu</string>
+    <string name="refresh">Refresh</string>
+    <string name="settings">Settings</string>
+    <string name="about">About</string>
+    <string name="select_default_filter">Select default filter</string>
+    <string name="tick5_settings">Tick5 Settings</string>
+    <string name="accept">Accept</string>
+    <string name="about_sample">Some info text need to be placed here.</string>
+    <string name="about_tick5">About Tick5</string>
 
 </resources>

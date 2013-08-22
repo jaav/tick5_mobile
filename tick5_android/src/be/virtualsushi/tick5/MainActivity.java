@@ -47,6 +47,7 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 	private String mCurrentKey;
 
 	private ViewPager mPager;
+	private TicksAdapter mTicksAdapter;
 	private RelativeLayout mProgressContainer;
 	private SensorManager mSensorManager;
 	private Sensor mSensor;
@@ -71,6 +72,8 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 
 		mProgressContainer = (RelativeLayout) findViewById(R.id.progress_container);
 		mPager = (ViewPager) findViewById(R.id.pager);
+		mTicksAdapter = new TicksAdapter(getSupportFragmentManager(), new Tick[0]);
+		mPager.setAdapter(mTicksAdapter);
 
 		mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -134,6 +137,7 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 
 			@Override
 			public void onResponse(String response) {
+				Log.d("Tick5", "Key:" + response);
 				mProgressContainer.setVisibility(View.VISIBLE);
 				mCurrentKey = response;
 				loadTicks(mCurrentKey);
@@ -180,7 +184,7 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 			if (preservePosition) {
 				position = mPager.getCurrentItem();
 			}
-			mPager.setAdapter(new TicksAdapter(getSupportFragmentManager(), mTweets));
+			mTicksAdapter.refreshData(mTweets);
 			if (position < 0) {
 				mPager.setCurrentItem(mPager.getChildCount() * TicksAdapter.LOOPS_COUNT / 2, false);
 			} else {
