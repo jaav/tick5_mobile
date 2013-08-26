@@ -33,7 +33,12 @@
         <activity
             android:name="be.virtualsushi.tick5.AboutActivity"
             android:label="@string/about_tick5" />
-
+        <activity
+            android:name="org.acra.CrashReportDialog"
+            android:excludeFromRecents="true"
+            android:finishOnTaskLaunch="true"
+            android:launchMode="singleInstance"
+            android:theme="@android:style/Theme.Dialog" />
     </application>
 
 </manifest>

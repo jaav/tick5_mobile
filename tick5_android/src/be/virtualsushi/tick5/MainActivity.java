@@ -41,6 +41,7 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 
 	public static final String FILTER_NAME_EXTRA = "filter_name";
 	public static final String TICKS_EXTRA = "ticks";
+	public static final String LATEST_POSITION_EXTRA = "latest_position";
 
 	private static final int CHANGE_SETTINGS_REQUEST_CODE = 1;
 
@@ -56,6 +57,7 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 	private float mAccel;
 
 	private Tick[] mTweets;
+	private int mLatestPosition = -1;
 
 	private boolean mShakeFreeze;
 
@@ -79,7 +81,14 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
 		if (savedInstanceState != null && savedInstanceState.containsKey(TICKS_EXTRA)) {
-			mTweets = (Tick[]) savedInstanceState.get(TICKS_EXTRA);
+			String[] ticks = savedInstanceState.getStringArray(TICKS_EXTRA);
+			mTweets = new Tick[ticks.length];
+			for (int i = 0; i < ticks.length; i++) {
+				mTweets[i] = Tick.fromJson(ticks[i]);
+			}
+			if (savedInstanceState.containsKey(LATEST_POSITION_EXTRA)) {
+				mLatestPosition = savedInstanceState.getInt(LATEST_POSITION_EXTRA);
+			}
 		}
 	}
 
@@ -87,7 +96,12 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		if (mTweets != null && mTweets.length > 0) {
-			outState.putSerializable(TICKS_EXTRA, mTweets);
+			String[] ticks = new String[mTweets.length];
+			for (int i = 0; i < mTweets.length; i++) {
+				ticks[i] = mTweets[i].toJson();
+			}
+			outState.putStringArray(TICKS_EXTRA, ticks);
+			outState.putInt(LATEST_POSITION_EXTRA, mPager.getCurrentItem());
 		}
 	}
 
@@ -95,7 +109,7 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 	protected void onResume() {
 		super.onResume();
 		if (mTweets != null) {
-			updatePager(false);
+			updatePager(true);
 		} else {
 			updateData();
 		}
@@ -180,16 +194,14 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 
 	private void updatePager(boolean preservePosition) {
 		if (mTweets != null) {
-			int position = -1;
-			if (preservePosition) {
-				position = mPager.getCurrentItem();
+			if (preservePosition && mLatestPosition < 0) {
+				mLatestPosition = mPager.getCurrentItem();
 			}
 			mTicksAdapter.refreshData(mTweets);
-			if (position < 0) {
-				mPager.setCurrentItem(mPager.getChildCount() * TicksAdapter.LOOPS_COUNT / 2, false);
-			} else {
-				mPager.setCurrentItem(position);
+			if (mLatestPosition < 0) {
+				mLatestPosition = mPager.getChildCount() * TicksAdapter.LOOPS_COUNT / 2;
 			}
+			mPager.setCurrentItem(mLatestPosition, false);
 			mProgressContainer.setVisibility(View.INVISIBLE);
 		}
 	}

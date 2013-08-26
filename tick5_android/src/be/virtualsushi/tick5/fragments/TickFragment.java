@@ -106,9 +106,6 @@ public class TickFragment extends SherlockFragment implements SwipeListener {
 			for (int i = 0; i < tick.urls.length; i++) {
 				TextView linkView = (TextView) inflater.inflate(R.layout.view_url_text, null, false);
 				linkView.setMovementMethod(LinkMovementMethod.getInstance());
-				if (i > 0) {
-					linkView.setPadding(0, getResources().getDimensionPixelSize(R.dimen.tiny), 0, 0);
-				}
 				linkView.setText(Html.fromHtml(tick.urls[i]));
 				mLinksContainer.addView(linkView);
 			}
