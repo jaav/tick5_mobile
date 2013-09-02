@@ -19,6 +19,7 @@ public class Tick5Request extends JsonRequest<Tick5Response> {
 
 	public Tick5Request(String key, Listener<Tick5Response> listener, ErrorListener errorListener) {
 		super(Method.GET, TICK5_REQUEST_URL_BASE + key, null, listener, errorListener);
+		setShouldCache(false);
 	}
 
 	@Override

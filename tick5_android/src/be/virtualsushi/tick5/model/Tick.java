@@ -28,4 +28,20 @@ public class Tick implements Serializable {
 		return GSON.toJson(this);
 	}
 
+	public static Tick[] fromJsonStringsArray(String[] json) {
+		Tick[] result = new Tick[json.length];
+		for (int i = 0; i < json.length; i++) {
+			result[i] = Tick.fromJson(json[i]);
+		}
+		return result;
+	}
+
+	public static String[] toJsonStringsArray(Tick[] ticks) {
+		String[] result = new String[ticks.length];
+		for (int i = 0; i < ticks.length; i++) {
+			result[i] = ticks[i].toJson();
+		}
+		return result;
+	}
+
 }

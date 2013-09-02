@@ -10,17 +10,17 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.view.ViewPager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
-import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 import be.virtualsushi.tick5.backend.ImageManager;
 import be.virtualsushi.tick5.backend.ImageManagerProvider;
 import be.virtualsushi.tick5.backend.PublicKeyRequest;
 import be.virtualsushi.tick5.backend.RequestQueueProvider;
 import be.virtualsushi.tick5.backend.Tick5Request;
-import be.virtualsushi.tick5.backend.TicksAdapter;
+import be.virtualsushi.tick5.fragments.PagerFragment;
+import be.virtualsushi.tick5.fragments.ProgressBarFragment;
 import be.virtualsushi.tick5.fragments.TickFragment.TickFragmentListener;
 import be.virtualsushi.tick5.model.Tick;
 import be.virtualsushi.tick5.model.Tick5Response;
@@ -37,7 +37,7 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 
-public class MainActivity extends SherlockFragmentActivity implements RobotoTypefaceProvider, RequestQueueProvider, ErrorListener, ImageManagerProvider, SensorEventListener, TickFragmentListener {
+public class MainActivity extends SherlockFragmentActivity implements RobotoTypefaceProvider, RequestQueueProvider, ErrorListener, ImageManagerProvider, SensorEventListener, TickFragmentListener, OnPageChangeListener {
 
 	public static final String FILTER_NAME_EXTRA = "filter_name";
 	public static final String TICKS_EXTRA = "ticks";
@@ -47,9 +47,6 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 
 	private String mCurrentKey;
 
-	private ViewPager mPager;
-	private TicksAdapter mTicksAdapter;
-	private RelativeLayout mProgressContainer;
 	private SensorManager mSensorManager;
 	private Sensor mSensor;
 
@@ -72,20 +69,11 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setDisplayUseLogoEnabled(false);
 
-		mProgressContainer = (RelativeLayout) findViewById(R.id.progress_container);
-		mPager = (ViewPager) findViewById(R.id.pager);
-		mTicksAdapter = new TicksAdapter(getSupportFragmentManager(), new Tick[0]);
-		mPager.setAdapter(mTicksAdapter);
-
 		mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
 		if (savedInstanceState != null && savedInstanceState.containsKey(TICKS_EXTRA)) {
-			String[] ticks = savedInstanceState.getStringArray(TICKS_EXTRA);
-			mTweets = new Tick[ticks.length];
-			for (int i = 0; i < ticks.length; i++) {
-				mTweets[i] = Tick.fromJson(ticks[i]);
-			}
+			mTweets = Tick.fromJsonStringsArray(savedInstanceState.getStringArray(TICKS_EXTRA));
 			if (savedInstanceState.containsKey(LATEST_POSITION_EXTRA)) {
 				mLatestPosition = savedInstanceState.getInt(LATEST_POSITION_EXTRA);
 			}
@@ -96,12 +84,8 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		if (mTweets != null && mTweets.length > 0) {
-			String[] ticks = new String[mTweets.length];
-			for (int i = 0; i < mTweets.length; i++) {
-				ticks[i] = mTweets[i].toJson();
-			}
-			outState.putStringArray(TICKS_EXTRA, ticks);
-			outState.putInt(LATEST_POSITION_EXTRA, mPager.getCurrentItem());
+			outState.putStringArray(TICKS_EXTRA, Tick.toJsonStringsArray(mTweets));
+			outState.putInt(LATEST_POSITION_EXTRA, mLatestPosition);
 		}
 	}
 
@@ -109,7 +93,7 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 	protected void onResume() {
 		super.onResume();
 		if (mTweets != null) {
-			updatePager(true);
+			showContent(true);
 		} else {
 			updateData();
 		}
@@ -147,12 +131,12 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 	}
 
 	private void updateData() {
+		showProgressBar();
 		getRequestQueue().add(new PublicKeyRequest(new Listener<String>() {
 
 			@Override
 			public void onResponse(String response) {
 				Log.d("Tick5", "Key:" + response);
-				mProgressContainer.setVisibility(View.VISIBLE);
 				mCurrentKey = response;
 				loadTicks(mCurrentKey);
 			}
@@ -185,24 +169,28 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 			public void onResponse(Tick5Response response) {
 				if (ResponseStatuses.OK.equals(response.status)) {
 					mTweets = response.tweets;
-					updatePager(false);
+					showContent(false);
 				}
 			}
 
 		}, this));
 	}
 
-	private void updatePager(boolean preservePosition) {
+	private void showProgressBar() {
+		FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+		fragmentTransaction.replace(R.id.container, new ProgressBarFragment());
+		fragmentTransaction.commit();
+	}
+
+	private void showContent(boolean preservePosition) {
 		if (mTweets != null) {
-			if (preservePosition && mLatestPosition < 0) {
-				mLatestPosition = mPager.getCurrentItem();
+			FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+			if (preservePosition) {
+				fragmentTransaction.replace(R.id.container, PagerFragment.getInstance(mTweets, mLatestPosition));
+			} else {
+				fragmentTransaction.replace(R.id.container, PagerFragment.getInstance(mTweets));
 			}
-			mTicksAdapter.refreshData(mTweets);
-			if (mLatestPosition < 0) {
-				mLatestPosition = mPager.getChildCount() * TicksAdapter.LOOPS_COUNT / 2;
-			}
-			mPager.setCurrentItem(mLatestPosition, false);
-			mProgressContainer.setVisibility(View.INVISIBLE);
+			fragmentTransaction.commit();
 		}
 	}
 
@@ -246,7 +234,7 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 				mShakeFreeze = true;
 				Log.d("SHAKE", "SHAKE");
 				getImageManager().nextFilter();
-				updatePager(true);
+				showContent(true);
 				mHandler.postDelayed(new Runnable() {
 
 					@Override
@@ -260,7 +248,22 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 
 	@Override
 	public void onFilterChange() {
-		updatePager(true);
+		showContent(true);
+	}
+
+	@Override
+	public void onPageScrollStateChanged(int arg0) {
+
+	}
+
+	@Override
+	public void onPageScrolled(int arg0, float arg1, int arg2) {
+
+	}
+
+	@Override
+	public void onPageSelected(int pageNum) {
+		mLatestPosition = pageNum;
 	}
 
 }
