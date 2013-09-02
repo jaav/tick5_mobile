@@ -1,6 +1,7 @@
 package be.virtualsushi.tick5.fragments;
 
 import android.app.Activity;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.Html;
@@ -50,6 +51,10 @@ public class TickFragment extends SherlockFragment implements SwipeListener {
 	private ImageManager mImageManager;
 	private TickFragmentListener mListener;
 
+	private int[] mDummyImageResources;
+
+	private Tick mTick;
+
 	public static TickFragment getIntance(Tick tick) {
 		TickFragment fragment = new TickFragment();
 		Bundle arguments = new Bundle();
@@ -64,6 +69,18 @@ public class TickFragment extends SherlockFragment implements SwipeListener {
 		mRobotoTypefaceProvider = FragmentUtils.tryActivityCast(getActivity(), RobotoTypefaceProvider.class, false);
 		mImageManager = FragmentUtils.tryActivityCast(getActivity(), ImageManagerProvider.class, false).getImageManager();
 		mListener = FragmentUtils.tryActivityCast(getActivity(), TickFragmentListener.class, false);
+		String[] filterNames = mImageManager.getFilterNames();
+		Resources resources = getResources();
+		mDummyImageResources = new int[filterNames.length];
+		for (int i = 0; i < mDummyImageResources.length; i++) {
+			mDummyImageResources[i] = resources.getIdentifier("no_image_" + filterNames[i], "drawable", activity.getPackageName());
+		}
+	}
+
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		mImageManager = null;
 	}
 
 	@Override
@@ -72,52 +89,48 @@ public class TickFragment extends SherlockFragment implements SwipeListener {
 
 		SwipeTouchDetector swipeTouchDetector = new SwipeTouchDetector(getActivity(), this);
 
-		Tick tick = (Tick) getArguments().get(TICK_ARGUMENT_NAME);
+		mTick = (Tick) getArguments().get(TICK_ARGUMENT_NAME);
 
 		mTweet = (TextView) result.findViewById(R.id.tweet);
 		mTweet.setMovementMethod(LinkMovementMethod.getInstance());
 		mTweet.setTypeface(mRobotoTypefaceProvider.getRobotoTypeface(RobotoTypefaces.REGULAR));
-		if (tick.hashtags != null) {
-			String formatterTweet = tick.tweet;
-			for (String hashTag : tick.hashtags) {
+		if (mTick.hashtags != null) {
+			String formatterTweet = mTick.tweet;
+			for (String hashTag : mTick.hashtags) {
 				String fullHashTagString = "#" + hashTag;
 				formatterTweet = formatterTweet.replace(fullHashTagString, String.format(TWITTER_HASHTAG_URL_PATTERN, hashTag, fullHashTagString));
 			}
 			mTweet.setText(Html.fromHtml(formatterTweet));
 		} else {
-			mTweet.setText(tick.tweet);
+			mTweet.setText(mTick.tweet);
 		}
 
 		mAuthor = (TextView) result.findViewById(R.id.author);
 		mAuthor.setMovementMethod(LinkMovementMethod.getInstance());
 		mAuthor.setTypeface(mRobotoTypefaceProvider.getRobotoTypeface(RobotoTypefaces.REGULAR));
-		mAuthor.setText(Html.fromHtml(String.format(TWITTER_AUTHOR_URL_PATTERN, tick.author, tick.author)));
+		mAuthor.setText(Html.fromHtml(String.format(TWITTER_AUTHOR_URL_PATTERN, mTick.author, mTick.author)));
 
 		mImage = (ImageView) result.findViewById(R.id.image);
 		mImage.setOnTouchListener(swipeTouchDetector);
-		mImage.setImageResource(getDrawableResourceIdByFilterName());
+		mImage.setImageResource(mDummyImageResources[mImageManager.getCurrentFilterIndex()]);
 
 		mContainer = (RelativeLayout) result.findViewById(R.id.container);
 		mContainer.setOnTouchListener(swipeTouchDetector);
 
 		mLinksContainer = (LinearLayout) result.findViewById(R.id.links_container);
-		if (tick.urls != null && tick.urls.length > 0) {
+		if (mTick.urls != null && mTick.urls.length > 0) {
 			mLinksContainer.setVisibility(View.VISIBLE);
-			for (int i = 0; i < tick.urls.length; i++) {
+			for (int i = 0; i < mTick.urls.length; i++) {
 				TextView linkView = (TextView) inflater.inflate(R.layout.view_url_text, null, false);
 				linkView.setMovementMethod(LinkMovementMethod.getInstance());
-				linkView.setText(Html.fromHtml(tick.urls[i]));
+				linkView.setText(Html.fromHtml(mTick.urls[i]));
 				mLinksContainer.addView(linkView);
 			}
 		}
 
-		loadImage(tick);
+		loadImage(mTick);
 
 		return result;
-	}
-
-	private int getDrawableResourceIdByFilterName() {
-		return getResources().getIdentifier("no_image_" + mImageManager.getFilterName(), "drawable", getActivity().getPackageName());
 	}
 
 	private void loadImage(Tick tick) {
@@ -129,7 +142,9 @@ public class TickFragment extends SherlockFragment implements SwipeListener {
 
 				@Override
 				public void onErrorResponse(VolleyError error) {
-					mImage.setImageResource(getDrawableResourceIdByFilterName());
+					if (isVisible()) {
+						mImage.setImageResource(mDummyImageResources[mImageManager.getCurrentFilterIndex()]);
+					}
 				}
 
 				@Override

@@ -94,12 +94,14 @@ public class ImageManager {
 		mFilterName = mFilters[currentFilterIndex];
 	}
 
-	private int getCurrentFilterIndex() {
+	public int getCurrentFilterIndex() {
 		for (int i = 0; i < mFilters.length; i++) {
 			if (mFilterName.equalsIgnoreCase(mFilters[i])) {
+				Log.d("ImageManager", "Filter name:" + mFilters[i]);
 				return i;
 			}
 		}
+		Log.d("ImageManager", "Default filter:" + mFilters[0]);
 		return 0;
 	}
 
@@ -118,5 +120,9 @@ public class ImageManager {
 			currentFilterIndex = mFilters.length - 1;
 		}
 		mFilterName = mFilters[currentFilterIndex];
+	}
+
+	public String[] getFilterNames() {
+		return mFilters;
 	}
 }

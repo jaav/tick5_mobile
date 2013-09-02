@@ -97,7 +97,9 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 		} else {
 			updateData();
 		}
+		mShakeFreeze = true;
 		mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_UI);
+		delayShakeUnfreeze();
 	}
 
 	@Override
@@ -235,15 +237,19 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 				Log.d("SHAKE", "SHAKE");
 				getImageManager().nextFilter();
 				showContent(true);
-				mHandler.postDelayed(new Runnable() {
-
-					@Override
-					public void run() {
-						mShakeFreeze = false;
-					}
-				}, 2000);
+				delayShakeUnfreeze();
 			}
 		}
+	}
+
+	private void delayShakeUnfreeze() {
+		mHandler.postDelayed(new Runnable() {
+
+			@Override
+			public void run() {
+				mShakeFreeze = false;
+			}
+		}, 2000);
 	}
 
 	@Override
