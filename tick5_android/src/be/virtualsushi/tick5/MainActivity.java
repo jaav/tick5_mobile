@@ -78,6 +78,7 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 				mLatestPosition = savedInstanceState.getInt(LATEST_POSITION_EXTRA);
 			}
 		}
+
 	}
 
 	@Override

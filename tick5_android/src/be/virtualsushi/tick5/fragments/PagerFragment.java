@@ -2,6 +2,7 @@ package be.virtualsushi.tick5.fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -20,7 +21,7 @@ public class PagerFragment extends Fragment {
 	public static PagerFragment getInstance(Tick[] ticks) {
 		PagerFragment fragment = new PagerFragment();
 		Bundle arguments = new Bundle();
-		arguments.putSerializable(TICKS_ARGUMENT, ticks);
+		arguments.putParcelableArray(TICKS_ARGUMENT, ticks);
 		fragment.setArguments(arguments);
 		return fragment;
 	}
@@ -47,7 +48,13 @@ public class PagerFragment extends Fragment {
 		View result = inflater.inflate(R.layout.fragment_pager, container, false);
 
 		mPager = (ViewPager) result.findViewById(R.id.pager);
-		mTicks = (Tick[]) getArguments().getSerializable(TICKS_ARGUMENT);
+		Parcelable[] parcelables = getArguments().getParcelableArray(TICKS_ARGUMENT);
+		mTicks = new Tick[parcelables.length];
+		int i = 0;
+		for (Parcelable parcelable : parcelables) {
+			mTicks[i] = (Tick) parcelable;
+			i++;
+		}
 		mPager.setAdapter(new TicksAdapter(getChildFragmentManager(), mTicks));
 		if (mOnPageChangeListener != null) {
 			mPager.setOnPageChangeListener(mOnPageChangeListener);

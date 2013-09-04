@@ -58,7 +58,7 @@ public class TickFragment extends SherlockFragment implements SwipeListener {
 	public static TickFragment getIntance(Tick tick) {
 		TickFragment fragment = new TickFragment();
 		Bundle arguments = new Bundle();
-		arguments.putSerializable(TICK_ARGUMENT_NAME, tick);
+		arguments.putParcelable(TICK_ARGUMENT_NAME, tick);
 		fragment.setArguments(arguments);
 		return fragment;
 	}
@@ -89,7 +89,7 @@ public class TickFragment extends SherlockFragment implements SwipeListener {
 
 		SwipeTouchDetector swipeTouchDetector = new SwipeTouchDetector(getActivity(), this);
 
-		mTick = (Tick) getArguments().get(TICK_ARGUMENT_NAME);
+		mTick = getArguments().getParcelable(TICK_ARGUMENT_NAME);
 
 		mTweet = (TextView) result.findViewById(R.id.tweet);
 		mTweet.setMovementMethod(LinkMovementMethod.getInstance());
