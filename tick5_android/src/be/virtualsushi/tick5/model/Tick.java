@@ -60,12 +60,12 @@ public class Tick implements Parcelable {
 		author = in.readString();
 		int length = in.readInt();
 		if (length >= 0) {
-			hashtags = new String[in.readInt()];
+			hashtags = new String[length];
 			in.readStringArray(hashtags);
 		}
 		length = in.readInt();
 		if (length >= 0) {
-			urls = new String[in.readInt()];
+			urls = new String[length];
 			in.readStringArray(urls);
 		}
 		image = in.readString();
