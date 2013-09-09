@@ -4,12 +4,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Typeface;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
@@ -22,6 +18,8 @@ import be.virtualsushi.tick5.backend.Tick5Request;
 import be.virtualsushi.tick5.fragments.PagerFragment;
 import be.virtualsushi.tick5.fragments.ProgressBarFragment;
 import be.virtualsushi.tick5.fragments.TickFragment.TickFragmentListener;
+import be.virtualsushi.tick5.gestures.ShakeDetector;
+import be.virtualsushi.tick5.gestures.ShakeDetector.ShakeDetectorListener;
 import be.virtualsushi.tick5.model.Tick;
 import be.virtualsushi.tick5.model.Tick5Response;
 import be.virtualsushi.tick5.model.Tick5Response.ResponseStatuses;
@@ -37,7 +35,7 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 
-public class MainActivity extends SherlockFragmentActivity implements RobotoTypefaceProvider, RequestQueueProvider, ErrorListener, ImageManagerProvider, SensorEventListener, TickFragmentListener, OnPageChangeListener {
+public class MainActivity extends SherlockFragmentActivity implements RobotoTypefaceProvider, RequestQueueProvider, ErrorListener, ImageManagerProvider, TickFragmentListener, OnPageChangeListener, ShakeDetectorListener {
 
 	public static final String FILTER_NAME_EXTRA = "filter_name";
 	public static final String TICKS_EXTRA = "ticks";
@@ -47,18 +45,10 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 
 	private String mCurrentKey;
 
-	private SensorManager mSensorManager;
-	private Sensor mSensor;
-
-	private float mAccelCurrent;
-	private float mAccel;
-
 	private Tick[] mTweets;
 	private int mLatestPosition = -1;
 
-	private boolean mShakeFreeze;
-
-	private Handler mHandler = new Handler();
+	private ShakeDetector mShakeDetector;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -69,8 +59,7 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setDisplayUseLogoEnabled(false);
 
-		mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+		mShakeDetector = new ShakeDetector((SensorManager) getSystemService(SENSOR_SERVICE), this);
 
 		if (savedInstanceState != null && savedInstanceState.containsKey(TICKS_EXTRA)) {
 			mTweets = Tick.fromJsonStringsArray(savedInstanceState.getStringArray(TICKS_EXTRA));
@@ -98,15 +87,13 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 		} else {
 			updateData();
 		}
-		mShakeFreeze = true;
-		mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_UI);
-		delayShakeUnfreeze();
+		mShakeDetector.onRegister();
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		mSensorManager.unregisterListener(this);
+		mShakeDetector.onUnregister();
 	}
 
 	@Override
@@ -218,42 +205,6 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 	}
 
 	@Override
-	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-	}
-
-	@Override
-	public void onSensorChanged(SensorEvent event) {
-		if (!mShakeFreeze && event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-			float x = event.values[0];
-			float y = event.values[1];
-			float z = event.values[2];
-			float accelLast = mAccelCurrent;
-			mAccelCurrent = (float) Math.sqrt((double) (x * x + y * y + z * z));
-			float delta = mAccelCurrent - accelLast;
-			mAccel = mAccel * 0.9f + delta;
-
-			if (mAccel > 10) {
-				mShakeFreeze = true;
-				Log.d("SHAKE", "SHAKE");
-				getImageManager().nextFilter();
-				showContent(true);
-				delayShakeUnfreeze();
-			}
-		}
-	}
-
-	private void delayShakeUnfreeze() {
-		mHandler.postDelayed(new Runnable() {
-
-			@Override
-			public void run() {
-				mShakeFreeze = false;
-			}
-		}, 2000);
-	}
-
-	@Override
 	public void onFilterChange() {
 		showContent(true);
 	}
@@ -271,6 +222,13 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 	@Override
 	public void onPageSelected(int pageNum) {
 		mLatestPosition = pageNum;
+	}
+
+	@Override
+	public void onShake() {
+		Log.d("SHAKE", "SHAKE");
+		getImageManager().nextFilter();
+		showContent(true);
 	}
 
 }
