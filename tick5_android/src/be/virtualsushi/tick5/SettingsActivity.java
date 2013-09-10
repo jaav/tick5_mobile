@@ -29,8 +29,10 @@ public class SettingsActivity extends SherlockFragmentActivity implements Roboto
 		setContentView(R.layout.activity_settings);
 
 		ActionBar actionBar = getSupportActionBar();
-		actionBar.setDisplayUseLogoEnabled(false);
 		actionBar.setDisplayHomeAsUpEnabled(true);
+		actionBar.setDisplayShowHomeEnabled(false);
+		actionBar.setDisplayShowTitleEnabled(true);
+		actionBar.setDisplayUseLogoEnabled(false);
 
 		mTitle = (TextView) findViewById(R.id.title);
 		mTitle.setTypeface(getRobotoTypeface(RobotoTypefaces.LIGHT));

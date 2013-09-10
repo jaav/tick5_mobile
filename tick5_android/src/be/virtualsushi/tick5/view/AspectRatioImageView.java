@@ -29,11 +29,10 @@ public class AspectRatioImageView extends ImageView {
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		int width = MeasureSpec.getSize(widthMeasureSpec);
 		int height = MeasureSpec.getSize(heightMeasureSpec);
-		if (mResources.getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && getDrawable().getIntrinsicWidth() > 0) {
-			height = width * getDrawable().getIntrinsicHeight() / getDrawable().getIntrinsicWidth();
-		}
-		if (mResources.getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && getDrawable().getIntrinsicHeight() > 0) {
-			width = height * getDrawable().getIntrinsicWidth() / getDrawable().getIntrinsicHeight();
+		if (mResources.getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			height = width;
+		} else {
+			width = height;
 		}
 		setMeasuredDimension(width, height);
 	}

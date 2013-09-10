@@ -41,6 +41,14 @@ public class Tick implements Parcelable {
 		return result;
 	}
 
+	public static String arrayToJson(Tick[] ticks) {
+		return GSON.toJson(ticks);
+	}
+
+	public static Tick[] jsonToArray(String json) {
+		return GSON.fromJson(json, Tick[].class);
+	}
+
 	private static final Gson GSON = new Gson();
 
 	public String id;

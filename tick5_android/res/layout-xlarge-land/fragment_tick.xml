@@ -7,35 +7,23 @@
 
     <be.virtualsushi.tick5.view.AspectRatioImageView
         android:id="@+id/image"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:contentDescription="@string/image"
         android:src="@drawable/ic_placeholder" />
 
-    <TextView
-        android:id="@+id/author"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/image"
-        android:layout_alignRight="@id/image"
-        android:layout_marginBottom="@dimen/small"
-        android:layout_marginRight="@dimen/small"
-        android:background="@drawable/text_background_pressed"
-        android:textColor="@android:color/white"
-        android:textColorLink="@android:color/white" />
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/image"
+        android:layout_toRightOf="@id/image"
         android:fillViewport="true"
         android:isScrollContainer="true"
         android:measureAllChildren="true" >
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="0dp" >
 
             <TextView
                 android:id="@+id/tweet"
@@ -43,12 +31,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_marginTop="@dimen/normal"
+                android:layout_marginTop="@dimen/tiny"
                 android:autoLink="web"
                 android:gravity="center_horizontal"
                 android:linksClickable="true"
                 android:paddingLeft="@dimen/normal"
-                android:paddingRight="@dimen/normal" />
+                android:paddingRight="@dimen/normal"
+                android:textSize="@dimen/text_large" />
 
             <LinearLayout
                 android:id="@+id/links_container"
@@ -56,11 +45,21 @@
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@id/tweet"
                 android:layout_below="@id/tweet"
-                android:layout_marginLeft="@dimen/normal"
-                android:layout_marginRight="@dimen/normal"
                 android:layout_marginTop="@dimen/normal"
                 android:orientation="vertical"
                 android:visibility="invisible" />
+
+            <TextView
+                android:id="@+id/author"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginBottom="@dimen/large"
+                android:layout_marginRight="@dimen/normal"
+                android:textColor="@android:color/white"
+                android:textColorLink="@android:color/white"
+                android:textSize="@dimen/text_large" />
         </RelativeLayout>
     </ScrollView>
 

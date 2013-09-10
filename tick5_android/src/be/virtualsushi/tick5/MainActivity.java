@@ -58,6 +58,7 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setDisplayUseLogoEnabled(false);
+		actionBar.setDisplayShowTitleEnabled(false);
 
 		mShakeDetector = new ShakeDetector((SensorManager) getSystemService(SENSOR_SERVICE), this);
 
@@ -65,6 +66,11 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 			mTweets = Tick.fromJsonStringsArray(savedInstanceState.getStringArray(TICKS_EXTRA));
 			if (savedInstanceState.containsKey(LATEST_POSITION_EXTRA)) {
 				mLatestPosition = savedInstanceState.getInt(LATEST_POSITION_EXTRA);
+			}
+		} else {
+			String jsonString = getSharedPreferences(Tick5Application.TICK5_PREFERENCES, MODE_PRIVATE).getString(Tick5Application.SAVED_TWEETS_PREFERENCE, null);
+			if (jsonString != null) {
+				mTweets = Tick.jsonToArray(jsonString);
 			}
 		}
 
@@ -94,6 +100,9 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 	protected void onPause() {
 		super.onPause();
 		mShakeDetector.onUnregister();
+		Editor editor = getSharedPreferences(Tick5Application.TICK5_PREFERENCES, MODE_PRIVATE).edit();
+		editor.putString(Tick5Application.SAVED_TWEETS_PREFERENCE, Tick.arrayToJson(mTweets));
+		editor.commit();
 	}
 
 	@Override
@@ -121,7 +130,9 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 	}
 
 	private void updateData() {
-		showProgressBar();
+		if (mTweets == null) {
+			showProgressBar();
+		}
 		getRequestQueue().add(new PublicKeyRequest(new Listener<String>() {
 
 			@Override
