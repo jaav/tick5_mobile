@@ -22,8 +22,10 @@
         android:layout_marginBottom="@dimen/small"
         android:layout_marginRight="@dimen/small"
         android:background="@drawable/text_background_pressed"
+        android:gravity="center"
         android:textColor="@android:color/white"
-        android:textColorLink="@android:color/white" />
+        android:textColorLink="@android:color/white"
+        android:textSize="@dimen/text_semi_large" />
 
     <ScrollView
         android:layout_width="match_parent"

@@ -40,10 +40,11 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 	public static final String FILTER_NAME_EXTRA = "filter_name";
 	public static final String TICKS_EXTRA = "ticks";
 	public static final String LATEST_POSITION_EXTRA = "latest_position";
+	public static final String LATEST_KEY_EXTRA = "latest_key";
 
 	private static final int CHANGE_SETTINGS_REQUEST_CODE = 1;
 
-	private String mCurrentKey;
+	private String mLatestKey;
 
 	private Tick[] mTweets;
 	private int mLatestPosition = -1;
@@ -62,16 +63,26 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 
 		mShakeDetector = new ShakeDetector((SensorManager) getSystemService(SENSOR_SERVICE), this);
 
-		if (savedInstanceState != null && savedInstanceState.containsKey(TICKS_EXTRA)) {
-			mTweets = Tick.fromJsonStringsArray(savedInstanceState.getStringArray(TICKS_EXTRA));
+		if (savedInstanceState != null) {
+			if (savedInstanceState.containsKey(TICKS_EXTRA)) {
+				mTweets = Tick.fromJsonStringsArray(savedInstanceState.getStringArray(TICKS_EXTRA));
+			}
 			if (savedInstanceState.containsKey(LATEST_POSITION_EXTRA)) {
 				mLatestPosition = savedInstanceState.getInt(LATEST_POSITION_EXTRA);
 			}
-		} else {
-			String jsonString = getSharedPreferences(Tick5Application.TICK5_PREFERENCES, MODE_PRIVATE).getString(Tick5Application.SAVED_TWEETS_PREFERENCE, null);
+			if (savedInstanceState.containsKey(LATEST_KEY_EXTRA)) {
+				mLatestKey = savedInstanceState.getString(LATEST_KEY_EXTRA);
+			}
+		}
+		if (mTweets == null) {
+			String jsonString = getTick5Preferences().getString(Tick5Application.SAVED_TWEETS_PREFERENCE, null);
 			if (jsonString != null) {
 				mTweets = Tick.jsonToArray(jsonString);
 			}
+		}
+
+		if (mLatestKey == null) {
+			mLatestKey = getTick5Preferences().getString(Tick5Application.SAVED_KEY_PREFERENCE, null);
 		}
 
 	}
@@ -82,6 +93,7 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 		if (mTweets != null && mTweets.length > 0) {
 			outState.putStringArray(TICKS_EXTRA, Tick.toJsonStringsArray(mTweets));
 			outState.putInt(LATEST_POSITION_EXTRA, mLatestPosition);
+			outState.putString(LATEST_KEY_EXTRA, mLatestKey);
 		}
 	}
 
@@ -89,10 +101,9 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 	protected void onResume() {
 		super.onResume();
 		if (mTweets != null) {
-			showContent(true);
-		} else {
-			updateData();
+			showContent(false);
 		}
+		updateData();
 		mShakeDetector.onRegister();
 	}
 
@@ -100,8 +111,9 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 	protected void onPause() {
 		super.onPause();
 		mShakeDetector.onUnregister();
-		Editor editor = getSharedPreferences(Tick5Application.TICK5_PREFERENCES, MODE_PRIVATE).edit();
+		Editor editor = getTick5Preferences().edit();
 		editor.putString(Tick5Application.SAVED_TWEETS_PREFERENCE, Tick.arrayToJson(mTweets));
+		editor.putString(Tick5Application.SAVED_KEY_PREFERENCE, mLatestKey);
 		editor.commit();
 	}
 
@@ -138,8 +150,10 @@ public class MainActivity extends SherlockFragmentActivity implements RobotoType
 			@Override
 			public void onResponse(String response) {
 				Log.d("Tick5", "Key:" + response);
-				mCurrentKey = response;
-				loadTicks(mCurrentKey);
+				if (mLatestKey == null || !response.equals(mLatestKey) || mTweets == null) {
+					mLatestKey = response;
+					loadTicks(mLatestKey);
+				}
 			}
 		}, this));
 	}

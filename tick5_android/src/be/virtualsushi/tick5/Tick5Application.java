@@ -25,6 +25,7 @@ public class Tick5Application extends Application implements RobotoTypefaceProvi
 	public static final String TICK5_PREFERENCES = "tick5_preferences";
 	public static final String DEFAULT_FILTER_NAME_PREFERENCE = "default_filter";
 	public static final String SAVED_TWEETS_PREFERENCE = "tweets";
+	public static final String SAVED_KEY_PREFERENCE = "key";
 
 	private static final String ROBOTO_TYPEFACE_NAME_PATTERN = "Roboto-%s.ttf";
 

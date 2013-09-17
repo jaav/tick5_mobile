@@ -56,8 +56,10 @@
                 android:layout_alignParentRight="true"
                 android:layout_marginBottom="@dimen/large"
                 android:layout_marginRight="@dimen/normal"
+                android:gravity="center"
                 android:textColor="@android:color/white"
-                android:textColorLink="@android:color/white" />
+                android:textColorLink="@android:color/white"
+                android:textSize="@dimen/text_semi_large" />
         </RelativeLayout>
     </ScrollView>
 
