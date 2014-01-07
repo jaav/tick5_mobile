@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
@@ -23,12 +24,11 @@ import be.virtualsushi.tick5.model.Tick;
 import be.virtualsushi.tick5.roboto.RobotoTypefaceProvider;
 import be.virtualsushi.tick5.roboto.RobotoTypefaces;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader.ImageContainer;
 import com.android.volley.toolbox.ImageLoader.ImageListener;
 
-public class TickFragment extends SherlockFragment implements SwipeListener {
+public class TickFragment extends Fragment implements SwipeListener {
 
 	public interface TickFragmentListener {
 

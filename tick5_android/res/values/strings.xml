@@ -18,6 +18,7 @@
         <item>squared</item>
     </string-array>
 
+    <string name="news">News</string>
     <string name="menu">Menu</string>
     <string name="refresh">Refresh</string>
     <string name="settings">Settings</string>
@@ -27,5 +28,11 @@
     <string name="accept">Accept</string>
     <string name="about_sample">Some info text need to be placed here.</string>
     <string name="about_tick5">About Double Blind</string>
+    <string name="share">Share</string>
+    <string name="share_tweet_postfix"> - via @%1$s and @dblnd</string>
+
+    <!-- Drawer -->
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
 
 </resources>

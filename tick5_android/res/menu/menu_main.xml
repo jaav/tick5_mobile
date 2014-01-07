@@ -1,28 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tick5="http://schemas.android.com/apk/res-auto" >
 
     <item
-        android:id="@+id/menu_overflow"
-        android:icon="@drawable/ic_action_overflow"
-        android:showAsAction="always|collapseActionView"
-        android:title="@string/menu">
-        <menu>
-            <item
-                android:id="@+id/menu_refresh"
-                android:icon="@drawable/ic_menu_refresh"
-                android:showAsAction="never"
-                android:title="@string/refresh"/>
-            <item
-                android:id="@+id/menu_settings"
-                android:icon="@drawable/ic_menu_settings"
-                android:showAsAction="never"
-                android:title="@string/settings"/>
-            <item
-                android:id="@+id/menu_about"
-                android:icon="@drawable/ic_menu_about"
-                android:showAsAction="never"
-                android:title="@string/about"/>
-        </menu>
-    </item>
+        android:id="@+id/menu_share"
+        android:icon="@drawable/ic_action_share"
+        android:title="@string/share"
+        tick5:actionProviderClass="be.virtualsushi.tick5.backend.ShareActionProvider"
+        tick5:showAsAction="always"/>
+    <item
+        android:id="@+id/menu_refresh"
+        android:icon="@drawable/ic_menu_refresh"
+        android:title="@string/refresh"
+        tick5:showAsAction="always"/>
+    <item
+        android:id="@+id/menu_settings"
+        android:icon="@drawable/ic_menu_settings"
+        android:title="@string/settings"
+        tick5:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/menu_about"
+        android:icon="@drawable/ic_menu_about"
+        android:title="@string/about"
+        tick5:showAsAction="ifRoom"/>
 
 </menu>

@@ -3,6 +3,10 @@ package be.virtualsushi.tick5;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -12,12 +16,7 @@ import be.virtualsushi.tick5.backend.FiltersAdapter;
 import be.virtualsushi.tick5.roboto.RobotoTypefaceProvider;
 import be.virtualsushi.tick5.roboto.RobotoTypefaces;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-
-public class SettingsActivity extends SherlockFragmentActivity implements RobotoTypefaceProvider, OnItemSelectedListener {
+public class SettingsActivity extends ActionBarActivity implements RobotoTypefaceProvider, OnItemSelectedListener {
 
 	private TextView mTitle;
 	private Spinner mSelector;
@@ -58,8 +57,8 @@ public class SettingsActivity extends SherlockFragmentActivity implements Roboto
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getSupportMenuInflater().inflate(R.menu.menu_settings, menu);
-		return super.onCreateOptionsMenu(menu);
+		getMenuInflater().inflate(R.menu.menu_settings, menu);
+		return true;
 	}
 
 	@Override

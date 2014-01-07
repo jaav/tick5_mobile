@@ -6,18 +6,17 @@ import java.io.InputStreamReader;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.TextView;
 import be.virtualsushi.tick5.roboto.RobotoTypefaceProvider;
 import be.virtualsushi.tick5.roboto.RobotoTypefaces;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.MenuItem;
-
-public class AboutActivity extends SherlockActivity implements RobotoTypefaceProvider {
+public class AboutActivity extends ActionBarActivity implements RobotoTypefaceProvider {
 
 	private TextView mAbout;
 

@@ -1,9 +1,0 @@
-<resources>
-
-    <style name="AppBaseTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <item name="android:actionBarStyle">@style/AppTheme.ActionBarStyle</item>
-    </style>
-
-    <style name="AppTheme.ActionBarStyle" parent="android:Widget.Holo.Light.ActionBar.Solid.Inverse"></style>
-
-</resources>
