@@ -13,15 +13,5 @@
         android:icon="@drawable/ic_menu_refresh"
         android:title="@string/refresh"
         tick5:showAsAction="always"/>
-    <item
-        android:id="@+id/menu_settings"
-        android:icon="@drawable/ic_menu_settings"
-        android:title="@string/settings"
-        tick5:showAsAction="ifRoom"/>
-    <item
-        android:id="@+id/menu_about"
-        android:icon="@drawable/ic_menu_about"
-        android:title="@string/about"
-        tick5:showAsAction="ifRoom"/>
 
 </menu>

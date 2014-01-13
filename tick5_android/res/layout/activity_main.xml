@@ -8,14 +8,14 @@
         android:id="@+id/content_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/black" />
+        android:background="@color/dblnd_red" />
 
     <ListView
         android:id="@+id/left_drawer"
         android:layout_width="240dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="#111"
+        android:background="@color/dblnd_red"
         android:choiceMode="singleChoice"
         android:divider="@color/background_holo_light"
         android:dividerHeight="@dimen/none" />

@@ -87,7 +87,7 @@ public class MainActivity extends ActionBarActivity implements RobotoTypefacePro
 		setContentView(R.layout.activity_main);
 
 		ActionBar actionBar = getSupportActionBar();
-		actionBar.setDisplayShowTitleEnabled(false);
+		actionBar.setDisplayShowTitleEnabled(true);
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setHomeButtonEnabled(true);
 

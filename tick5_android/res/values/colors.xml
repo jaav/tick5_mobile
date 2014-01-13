@@ -31,6 +31,7 @@
     <color name="black">#000000</color>
 
     <!-- Red -->
+    <color name="dblnd_red">#bb0000</color>
     <color name="red">#cc0000</color>
     <color name="lighter_red">#ff4444</color>
 
