@@ -101,17 +101,7 @@ public class MainActivity extends ActionBarActivity implements RobotoTypefacePro
 				new DrawerListItem(R.drawable.ic_menu_about, R.string.about) }, this));
 		mDrawerList.setOnItemClickListener(this);
 
-		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
-			public void onDrawerClosed(View view) {
-				supportInvalidateOptionsMenu();
-
-			}
-
-			public void onDrawerOpened(View drawerView) {
-				supportInvalidateOptionsMenu();
-
-			}
-		};
+		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close);
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 
 		if (savedInstanceState != null) {
@@ -201,6 +191,15 @@ public class MainActivity extends ActionBarActivity implements RobotoTypefacePro
 			break;
 		}
 		return true;
+	}
+
+	@Override
+	public void onBackPressed() {
+		if (mScreenIndex != TICK_SCREEN_INDEX) {
+			selectItem(TICK_SCREEN_INDEX);
+		} else {
+			super.onBackPressed();
+		}
 	}
 
 	private void updateData() {
@@ -336,6 +335,7 @@ public class MainActivity extends ActionBarActivity implements RobotoTypefacePro
 		if (fragment != null) {
 			replaceContentFragment(fragment);
 		}
+		supportInvalidateOptionsMenu();
 		mDrawerList.setItemChecked(position, true);
 		mDrawerLayout.closeDrawer(mDrawerList);
 	}
