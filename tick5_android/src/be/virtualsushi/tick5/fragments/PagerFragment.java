@@ -10,11 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import be.virtualsushi.tick5.R;
-import be.virtualsushi.tick5.backend.EventBusProvider;
 import be.virtualsushi.tick5.backend.TicksAdapter;
-import be.virtualsushi.tick5.events.UpdateTicksEvent;
 import be.virtualsushi.tick5.model.Tick;
-import de.greenrobot.event.EventBus;
 
 public class PagerFragment extends Fragment {
 
@@ -37,7 +34,6 @@ public class PagerFragment extends Fragment {
 
 	private ViewPager mPager;
 	private OnPageChangeListener mOnPageChangeListener;
-	private EventBus mEventBus;
 
 	private Tick[] mTicks;
 
@@ -45,7 +41,6 @@ public class PagerFragment extends Fragment {
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		mOnPageChangeListener = FragmentUtils.tryActivityCast(getActivity(), OnPageChangeListener.class, true);
-		mEventBus = FragmentUtils.tryActivityCast(getActivity(), EventBusProvider.class, false).getEventBus();
 	}
 
 	@Override
@@ -69,31 +64,14 @@ public class PagerFragment extends Fragment {
 	}
 
 	@Override
-	public void onPause() {
-		super.onPause();
-		mEventBus.unregister(this);
-	}
-
-	@Override
 	public void onResume() {
 		super.onResume();
-		mEventBus.register(this);
 		Bundle arguments = getArguments();
 		if (arguments.containsKey(POSITION_ARGUMENT)) {
 			mPager.setCurrentItem(arguments.getInt(POSITION_ARGUMENT));
 		} else {
 			mPager.setCurrentItem(mTicks.length * TicksAdapter.LOOPS_COUNT / 2);
 		}
-	}
-
-	public void onEvent(UpdateTicksEvent event) {
-		mTicks = event.ticks;
-		int position = mTicks.length * TicksAdapter.LOOPS_COUNT / 2;
-		if (event.rememberPosition) {
-			position = mPager.getCurrentItem();
-		}
-		mPager.setAdapter(new TicksAdapter(getChildFragmentManager(), mTicks));
-		mPager.setCurrentItem(position);
 	}
 
 }
