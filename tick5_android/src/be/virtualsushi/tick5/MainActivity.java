@@ -54,6 +54,12 @@ import com.android.volley.VolleyError;
 
 import de.greenrobot.event.EventBus;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 public class MainActivity extends ActionBarActivity implements RobotoTypefaceProvider, RequestQueueProvider, ErrorListener, ImageManagerProvider, TickFragmentListener, OnPageChangeListener, ShakeDetectorListener, SettingsFragmentListener,
 		OnItemClickListener, EventBusProvider {
 
@@ -64,8 +70,9 @@ public class MainActivity extends ActionBarActivity implements RobotoTypefacePro
 	public static final String SCREEN_INDEX_EXTRA = "screen_index";
 
 	private static final int TICK_SCREEN_INDEX = 0;
-	private static final int SETTINGS_SCREEN_INDEX = 1;
-	private static final int ABOUT_SCREEN_INDEX = 2;
+	private static final int OLDER_TICKS_INDEX = 1;
+	private static final int SETTINGS_SCREEN_INDEX = 2;
+	private static final int ABOUT_SCREEN_INDEX = 3;
 
 	private String mLatestKey;
 
@@ -97,8 +104,8 @@ public class MainActivity extends ActionBarActivity implements RobotoTypefacePro
 		mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-		mDrawerList.setAdapter(new DrawerAdapter(this, new DrawerListItem[] { new DrawerListItem(R.drawable.ic_news, R.string.news), new DrawerListItem(R.drawable.ic_menu_settings, R.string.settings),
-				new DrawerListItem(R.drawable.ic_menu_about, R.string.about) }, this));
+		mDrawerList.setAdapter(new DrawerAdapter(this, new DrawerListItem[] { new DrawerListItem(R.drawable.ic_news, R.string.news), new DrawerListItem(R.drawable.ic_menu_older, R.string.older)
+				, new DrawerListItem(R.drawable.ic_menu_settings, R.string.settings), new DrawerListItem(R.drawable.ic_menu_about, R.string.about) }, this));
 		mDrawerList.setOnItemClickListener(this);
 
 		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close);
@@ -156,7 +163,7 @@ public class MainActivity extends ActionBarActivity implements RobotoTypefacePro
 	@Override
 	protected void onResume() {
 		super.onResume();
-		updateData();
+		updateData(true);
 		mShakeDetector.onRegister();
 	}
 
@@ -172,7 +179,7 @@ public class MainActivity extends ActionBarActivity implements RobotoTypefacePro
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		if (mScreenIndex == TICK_SCREEN_INDEX) {
+		if (mScreenIndex == TICK_SCREEN_INDEX || mScreenIndex == OLDER_TICKS_INDEX) {
 			getMenuInflater().inflate(R.menu.menu_main, menu);
 			mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menu.findItem(R.id.menu_share));
 			updateShareIntent();
@@ -187,7 +194,7 @@ public class MainActivity extends ActionBarActivity implements RobotoTypefacePro
 		}
 		switch (item.getItemId()) {
 		case R.id.menu_refresh:
-			updateData();
+			updateData(true);
 			break;
 		}
 		return true;
@@ -202,20 +209,26 @@ public class MainActivity extends ActionBarActivity implements RobotoTypefacePro
 		}
 	}
 
-	private void updateData() {
+	private void updateData(boolean fromServer) {
 		setSupportProgressBarIndeterminateVisibility(true);
-		getRequestQueue().add(new PublicKeyRequest(new Listener<String>() {
+		if(fromServer){
+			getRequestQueue().add(new PublicKeyRequest(new Listener<String>() {
 
-			@Override
-			public void onResponse(String response) {
-				setSupportProgressBarIndeterminateVisibility(false);
-				Log.d("Tick5", "Key:" + response);
-				if (mLatestKey == null || !response.equals(mLatestKey) || mTweets == null) {
-					mLatestKey = response;
-					loadTicks(mLatestKey);
+				@Override
+				public void onResponse(String response) {
+					setSupportProgressBarIndeterminateVisibility(false);
+					Log.d("Tick5", "Key:" + response);
+					if (mLatestKey == null || !response.equals(mLatestKey) || mTweets == null) {
+						mLatestKey = response;
+						loadTicks(mLatestKey);
+					}
 				}
-			}
-		}, this));
+			}, this));
+		}
+		else{
+			setSupportProgressBarIndeterminateVisibility(false);
+			loadTicks(mLatestKey);
+		}
 	}
 
 	private Tick5Application getTick5Application() {
@@ -238,6 +251,7 @@ public class MainActivity extends ActionBarActivity implements RobotoTypefacePro
 	}
 
 	private void loadTicks(String key) {
+		Log.d("Tick5", "Loading ticks for key: " + key);
 		getRequestQueue().add(new Tick5Request(key, new Listener<Tick5Response>() {
 
 			@Override
@@ -325,6 +339,11 @@ public class MainActivity extends ActionBarActivity implements RobotoTypefacePro
 		case TICK_SCREEN_INDEX:
 			updateTicksScreen(true);
 			break;
+		case OLDER_TICKS_INDEX:
+			getOlderKey();
+			mTweets = null;
+			updateTicksScreen(true);
+			break;
 		case SETTINGS_SCREEN_INDEX:
 			fragment = SettingsFragment.newInstance(getTick5Preferences().getString(Tick5Application.DEFAULT_FILTER_NAME_PREFERENCE, "cartoon"));
 			break;
@@ -339,15 +358,36 @@ public class MainActivity extends ActionBarActivity implements RobotoTypefacePro
 		mDrawerList.setItemChecked(position, true);
 		mDrawerLayout.closeDrawer(mDrawerList);
 	}
+	
+	private void getOlderKey(){
+		//var previousKey = "2014_01_20_04_Q4";
+		if(mLatestKey.indexOf("Q4")>0) mLatestKey = mLatestKey.substring(0, 15)+ "3";
+		else if(mLatestKey.indexOf("Q3")>0) mLatestKey = mLatestKey.substring(0, 15)+ "2";
+		else if(mLatestKey.indexOf("Q2")>0) mLatestKey = mLatestKey.substring(0, 15)+ "1";
+		else if(mLatestKey.indexOf("Q1")>0){
+			int hour = Integer.parseInt(mLatestKey.substring(11, 13));
+			if(hour>0 && hour<11) mLatestKey =  mLatestKey.substring(0, 11)+ "0" +(hour-1)+ "_Q4";
+			else if(hour > 10) mLatestKey =  mLatestKey.substring(0, 11)+ (hour-1)+ "_Q4";
+			else{
+				Calendar today = new GregorianCalendar();
+				today.roll(Calendar.DAY_OF_YEAR, false);
+				DateFormat sdf = new SimpleDateFormat("yyyy_mm_dd_");
+				mLatestKey = sdf.format(today)+"23_Q4";
+			}
+		}
+	}
 
 	private void updateTicksScreen(boolean presetCurrentPosition) {
-		if (mScreenIndex != TICK_SCREEN_INDEX) {
+		if (mScreenIndex == SETTINGS_SCREEN_INDEX || mScreenIndex == ABOUT_SCREEN_INDEX) {
 			return;
 		}
 		if (mTweets != null) {
 			replaceContentFragment(presetCurrentPosition ? PagerFragment.getInstance(mTweets, mLatestPosition) : PagerFragment.getInstance(mTweets));
 		} else {
-			updateData();
+			if(mScreenIndex==TICK_SCREEN_INDEX)
+				updateData(true);
+			else
+				updateData(false);
 		}
 	}
 

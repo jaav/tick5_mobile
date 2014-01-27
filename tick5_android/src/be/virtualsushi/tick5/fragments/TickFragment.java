@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,9 @@ import be.virtualsushi.tick5.roboto.RobotoTypefaces;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader.ImageContainer;
 import com.android.volley.toolbox.ImageLoader.ImageListener;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TickFragment extends Fragment implements SwipeListener {
 
@@ -106,9 +110,23 @@ public class TickFragment extends Fragment implements SwipeListener {
 		}
 
 		mAuthor = (TextView) result.findViewById(R.id.author);
-		mAuthor.setMovementMethod(LinkMovementMethod.getInstance());
+		mAuthor.setText("@"+mTick.author);
+		//mAuthor.setMovementMethod(LinkMovementMethod.getInstance());
 		mAuthor.setTypeface(mRobotoTypefaceProvider.getRobotoTypeface(RobotoTypefaces.REGULAR));
-		mAuthor.setText(Html.fromHtml(String.format(TWITTER_AUTHOR_URL_PATTERN, mTick.author, mTick.author)));
+
+		Linkify.TransformFilter filter = new Linkify.TransformFilter() {
+		    public final String transformUrl(final Matcher match, String url) {
+		        return match.group();
+		    }
+		};
+
+		Pattern mentionPattern = Pattern.compile("@([A-Za-z0-9_-]+)");
+		String mentionScheme = "http://www.twitter.com/";
+		Linkify.addLinks(mAuthor, mentionPattern, mentionScheme, null, filter);
+
+
+		//mAuthor.setAutoLinkMask(Linkify.ALL);
+		//mAuthor.setText(Html.fromHtml(String.format(TWITTER_AUTHOR_URL_PATTERN, mTick.author, mTick.author)));
 
 		mImage = (ImageView) result.findViewById(R.id.image);
 		mImage.setOnTouchListener(swipeTouchDetector);
