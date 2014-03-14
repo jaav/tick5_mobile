@@ -139,10 +139,12 @@ public class TickFragment extends Fragment implements SwipeListener {
 		if (mTick.urls != null && mTick.urls.length > 0) {
 			mLinksContainer.setVisibility(View.VISIBLE);
 			for (int i = 0; i < mTick.urls.length; i++) {
-				TextView linkView = (TextView) inflater.inflate(R.layout.view_url_text, null, false);
-				linkView.setMovementMethod(LinkMovementMethod.getInstance());
-				linkView.setText(Html.fromHtml(mTick.urls[i]));
-				mLinksContainer.addView(linkView);
+				if(mTick.urls[i] != null){
+					TextView linkView = (TextView) inflater.inflate(R.layout.view_url_text, null, false);
+					linkView.setMovementMethod(LinkMovementMethod.getInstance());
+					linkView.setText(Html.fromHtml(mTick.urls[i]));
+					mLinksContainer.addView(linkView);
+				}
 			}
 		}
 
