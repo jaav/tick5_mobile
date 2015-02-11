@@ -18,11 +18,9 @@ import be.virtualsushi.tick5.backend.FiltersAdapter;
 import be.virtualsushi.tick5.roboto.RobotoTypefaceProvider;
 import be.virtualsushi.tick5.roboto.RobotoTypefaces;
 
-public class SettingsFragment extends Fragment implements OnItemSelectedListener, RobotoTypefaceProvider {
+public class SettingsFragment extends Fragment implements RobotoTypefaceProvider {
 
 	public interface SettingsFragmentListener {
-
-		void onFilterChanged(String filterName);
 
 	}
 
@@ -58,7 +56,6 @@ public class SettingsFragment extends Fragment implements OnItemSelectedListener
 		mSelector = (Spinner) result.findViewById(R.id.selector);
 		FiltersAdapter adapter = new FiltersAdapter(getActivity());
 		mSelector.setAdapter(adapter);
-		mSelector.setOnItemSelectedListener(this);
 
 		Bundle arguments = getArguments();
 		if (arguments != null && arguments.containsKey(MainActivity.FILTER_NAME_EXTRA)) {
@@ -82,15 +79,4 @@ public class SettingsFragment extends Fragment implements OnItemSelectedListener
 	public Typeface getRobotoTypeface(RobotoTypefaces name) {
 		return getTick5Application().getRobotoTypeface(name);
 	}
-
-	@Override
-	public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-		mListener.onFilterChanged((String) adapterView.getItemAtPosition(position));
-	}
-
-	@Override
-	public void onNothingSelected(AdapterView<?> adapterView) {
-
-	}
-
 }

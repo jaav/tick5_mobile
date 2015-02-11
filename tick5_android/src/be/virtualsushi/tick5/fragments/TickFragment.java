@@ -32,11 +32,9 @@ import com.android.volley.toolbox.ImageLoader.ImageListener;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TickFragment extends Fragment implements SwipeListener {
+public class TickFragment extends Fragment{
 
 	public interface TickFragmentListener {
-
-		void onFilterChange();
 
 	}
 
@@ -55,7 +53,7 @@ public class TickFragment extends Fragment implements SwipeListener {
 	private ImageManager mImageManager;
 	private TickFragmentListener mListener;
 
-	private int[] mDummyImageResources;
+	private int mDummyImageResource;
 
 	private Tick mTick;
 
@@ -73,12 +71,8 @@ public class TickFragment extends Fragment implements SwipeListener {
 		mRobotoTypefaceProvider = FragmentUtils.tryActivityCast(getActivity(), RobotoTypefaceProvider.class, false);
 		mImageManager = FragmentUtils.tryActivityCast(getActivity(), ImageManagerProvider.class, false).getImageManager();
 		mListener = FragmentUtils.tryActivityCast(getActivity(), TickFragmentListener.class, false);
-		String[] filterNames = mImageManager.getFilterNames();
 		Resources resources = getResources();
-		mDummyImageResources = new int[filterNames.length];
-		for (int i = 0; i < mDummyImageResources.length; i++) {
-			mDummyImageResources[i] = resources.getIdentifier("no_image_" + filterNames[i], "drawable", activity.getPackageName());
-		}
+		mDummyImageResource = resources.getIdentifier("no_image_squared", "drawable", activity.getPackageName());
 	}
 
 	@Override
@@ -90,8 +84,6 @@ public class TickFragment extends Fragment implements SwipeListener {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View result = inflater.inflate(R.layout.fragment_tick, container, false);
-
-		SwipeTouchDetector swipeTouchDetector = new SwipeTouchDetector(getActivity(), this);
 
 		mTick = getArguments().getParcelable(TICK_ARGUMENT_NAME);
 
@@ -129,11 +121,9 @@ public class TickFragment extends Fragment implements SwipeListener {
 		//mAuthor.setText(Html.fromHtml(String.format(TWITTER_AUTHOR_URL_PATTERN, mTick.author, mTick.author)));
 
 		mImage = (ImageView) result.findViewById(R.id.image);
-		mImage.setOnTouchListener(swipeTouchDetector);
-		mImage.setImageResource(mDummyImageResources[mImageManager.getCurrentFilterIndex()]);
+		mImage.setImageResource(mDummyImageResource);
 
 		mContainer = (RelativeLayout) result.findViewById(R.id.container);
-		mContainer.setOnTouchListener(swipeTouchDetector);
 
 		mLinksContainer = (LinearLayout) result.findViewById(R.id.links_container);
 		if (mTick.urls != null && mTick.urls.length > 0) {
@@ -163,7 +153,7 @@ public class TickFragment extends Fragment implements SwipeListener {
 				@Override
 				public void onErrorResponse(VolleyError error) {
 					if (isVisible()) {
-						mImage.setImageResource(mDummyImageResources[mImageManager.getCurrentFilterIndex()]);
+						mImage.setImageResource(mDummyImageResource);
 					}
 				}
 
@@ -173,15 +163,5 @@ public class TickFragment extends Fragment implements SwipeListener {
 				}
 			}, mImage.getWidth(), mImage.getHeight());
 		}
-	}
-
-	@Override
-	public void onSwipe(SwipeDirection direction) {
-		if (SwipeDirection.DOWN.equals(direction)) {
-			mImageManager.prevFilter();
-		} else {
-			mImageManager.nextFilter();
-		}
-		mListener.onFilterChange();
 	}
 }

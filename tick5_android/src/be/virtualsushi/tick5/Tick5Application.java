@@ -26,7 +26,7 @@ import de.greenrobot.event.EventBus;
 public class Tick5Application extends Application implements RobotoTypefaceProvider, RequestQueueProvider, ImageManagerProvider, EventBusProvider {
 
 	public static final String TICK5_PREFERENCES = "tick5_preferences";
-	public static final String DEFAULT_FILTER_NAME_PREFERENCE = "default_filter";
+	//public static final String DEFAULT_FILTER_NAME_PREFERENCE = "default_filter";
 	public static final String SAVED_TWEETS_PREFERENCE = "tweets";
 	public static final String SAVED_KEY_PREFERENCE = "key";
 

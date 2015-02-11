@@ -19,7 +19,7 @@ import com.android.volley.toolbox.ImageLoader.ImageListener;
 
 public class ImageManager {
 
-	private static final String TICK5_IMAGE_URL_PATTERN = "http://tick5.be/repo/datatracker_images/%s_%s.jpg";
+	private static final String TICK5_IMAGE_URL_PATTERN = "http://tick5.be/repo/datatracker_images/%s_squared.jpg";
 
 	private class DiskImageCache implements ImageCache {
 
@@ -60,8 +60,6 @@ public class ImageManager {
 	}
 
 	private ImageLoader mImageLoader;
-	private String mFilterName;
-	private String[] mFilters;
 	private ImageCache mImageCache;
 
 	public ImageManager(Context context) {
@@ -72,57 +70,14 @@ public class ImageManager {
 			mImageCache = new DiskImageCache(context.getCacheDir());
 		}
 		mImageLoader = new ImageLoader(((Tick5Application) context.getApplicationContext()).getRequestQueue(), mImageCache);
-		mFilters = context.getResources().getStringArray(R.array.filters);
-		mFilterName = context.getSharedPreferences(Tick5Application.TICK5_PREFERENCES, Context.MODE_PRIVATE).getString(Tick5Application.DEFAULT_FILTER_NAME_PREFERENCE, "cartoon");
 	}
 
 	public void loadImage(String imageId, ImageListener imageListener, int maxWidth, int maxHeight) {
-		String requestUrl = String.format(TICK5_IMAGE_URL_PATTERN, imageId, mFilterName);
+		String requestUrl = String.format(TICK5_IMAGE_URL_PATTERN, imageId);
 		mImageLoader.get(requestUrl, imageListener, maxWidth, maxHeight);
 	}
 
 	public Bitmap loadFromCache(String imageId) {
-		return mImageCache.getBitmap(String.format(TICK5_IMAGE_URL_PATTERN, imageId, mFilterName));
-	}
-
-	public void nextFilter() {
-		int currentFilterIndex = getCurrentFilterIndex();
-		currentFilterIndex++;
-		if (currentFilterIndex >= mFilters.length) {
-			currentFilterIndex = 0;
-		}
-		mFilterName = mFilters[currentFilterIndex];
-	}
-
-	public int getCurrentFilterIndex() {
-		for (int i = 0; i < mFilters.length; i++) {
-			if (mFilterName.equalsIgnoreCase(mFilters[i])) {
-				Log.d("ImageManager", "Filter name:" + mFilters[i]);
-				return i;
-			}
-		}
-		Log.d("ImageManager", "Default filter:" + mFilters[0]);
-		return 0;
-	}
-
-	public void setFilterName(String filterName) {
-		mFilterName = filterName;
-	}
-
-	public String getFilterName() {
-		return mFilterName;
-	}
-
-	public void prevFilter() {
-		int currentFilterIndex = getCurrentFilterIndex();
-		currentFilterIndex--;
-		if (currentFilterIndex < 0) {
-			currentFilterIndex = mFilters.length - 1;
-		}
-		mFilterName = mFilters[currentFilterIndex];
-	}
-
-	public String[] getFilterNames() {
-		return mFilters;
+		return mImageCache.getBitmap(String.format(TICK5_IMAGE_URL_PATTERN, imageId));
 	}
 }

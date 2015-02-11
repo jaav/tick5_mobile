@@ -38,8 +38,6 @@ import be.virtualsushi.tick5.fragments.PagerFragment;
 import be.virtualsushi.tick5.fragments.SettingsFragment;
 import be.virtualsushi.tick5.fragments.SettingsFragment.SettingsFragmentListener;
 import be.virtualsushi.tick5.fragments.TickFragment.TickFragmentListener;
-import be.virtualsushi.tick5.gestures.ShakeDetector;
-import be.virtualsushi.tick5.gestures.ShakeDetector.ShakeDetectorListener;
 import be.virtualsushi.tick5.model.DrawerListItem;
 import be.virtualsushi.tick5.model.Tick;
 import be.virtualsushi.tick5.model.Tick5Response;
@@ -60,8 +58,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-public class MainActivity extends ActionBarActivity implements RobotoTypefaceProvider, RequestQueueProvider, ErrorListener, ImageManagerProvider, TickFragmentListener, OnPageChangeListener, ShakeDetectorListener, SettingsFragmentListener,
-		OnItemClickListener, EventBusProvider {
+public class MainActivity extends ActionBarActivity implements RobotoTypefaceProvider, RequestQueueProvider, ErrorListener, ImageManagerProvider, TickFragmentListener, OnPageChangeListener, OnItemClickListener, EventBusProvider {
 
 	public static final String FILTER_NAME_EXTRA = "filter_name";
 	public static final String TICKS_EXTRA = "ticks";
@@ -71,8 +68,7 @@ public class MainActivity extends ActionBarActivity implements RobotoTypefacePro
 
 	private static final int TICK_SCREEN_INDEX = 0;
 	private static final int OLDER_TICKS_INDEX = 1;
-	private static final int SETTINGS_SCREEN_INDEX = 2;
-	private static final int ABOUT_SCREEN_INDEX = 3;
+	private static final int ABOUT_SCREEN_INDEX = 2;
 
 	private String mLatestKey;
 
@@ -80,7 +76,6 @@ public class MainActivity extends ActionBarActivity implements RobotoTypefacePro
 	private int mLatestPosition = -1;
 	private int mScreenIndex;
 
-	private ShakeDetector mShakeDetector;
 	private ShareActionProvider mShareActionProvider;
 
 	private DrawerLayout mDrawerLayout;
@@ -98,14 +93,12 @@ public class MainActivity extends ActionBarActivity implements RobotoTypefacePro
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setHomeButtonEnabled(true);
 
-		mShakeDetector = new ShakeDetector((SensorManager) getSystemService(SENSOR_SERVICE), this);
-
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-		mDrawerList.setAdapter(new DrawerAdapter(this, new DrawerListItem[] { new DrawerListItem(R.drawable.ic_news, R.string.news), new DrawerListItem(R.drawable.ic_menu_older, R.string.older)
-				, new DrawerListItem(R.drawable.ic_menu_settings, R.string.settings), new DrawerListItem(R.drawable.ic_menu_about, R.string.about) }, this));
+		mDrawerList.setAdapter(new DrawerAdapter(this, new DrawerListItem[] { new DrawerListItem(R.drawable.ic_news, R.string.latest), new DrawerListItem(R.drawable.ic_menu_older, R.string.older)
+				,new DrawerListItem(R.drawable.ic_menu_about, R.string.about) }, this));
 		mDrawerList.setOnItemClickListener(this);
 
 		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close);
@@ -163,14 +156,12 @@ public class MainActivity extends ActionBarActivity implements RobotoTypefacePro
 	@Override
 	protected void onResume() {
 		super.onResume();
-		updateData(true);
-		mShakeDetector.onRegister();
+		//updateData(true);
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		mShakeDetector.onUnregister();
 		Editor editor = getTick5Preferences().edit();
 		editor.putString(Tick5Application.SAVED_TWEETS_PREFERENCE, Tick.arrayToJson(mTweets));
 		editor.putString(Tick5Application.SAVED_KEY_PREFERENCE, mLatestKey);
@@ -198,15 +189,6 @@ public class MainActivity extends ActionBarActivity implements RobotoTypefacePro
 			break;
 		}
 		return true;
-	}
-
-	@Override
-	public void onBackPressed() {
-		if (mScreenIndex != TICK_SCREEN_INDEX) {
-			selectItem(TICK_SCREEN_INDEX);
-		} else {
-			super.onBackPressed();
-		}
 	}
 
 	private void updateData(boolean fromServer) {
@@ -276,11 +258,6 @@ public class MainActivity extends ActionBarActivity implements RobotoTypefacePro
 	}
 
 	@Override
-	public void onFilterChange() {
-		updateTicksScreen(true);
-	}
-
-	@Override
 	public void onPageScrollStateChanged(int arg0) {
 
 	}
@@ -315,19 +292,6 @@ public class MainActivity extends ActionBarActivity implements RobotoTypefacePro
 	}
 
 	@Override
-	public void onShake() {
-		Log.d("SHAKE", "SHAKE");
-		getImageManager().nextFilter();
-		updateTicksScreen(true);
-	}
-
-	@Override
-	public void onFilterChanged(String filterName) {
-		getImageManager().setFilterName(filterName);
-		getTick5Preferences().edit().putString(Tick5Application.DEFAULT_FILTER_NAME_PREFERENCE, filterName).commit();
-	}
-
-	@Override
 	public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 		selectItem(position);
 	}
@@ -337,15 +301,12 @@ public class MainActivity extends ActionBarActivity implements RobotoTypefacePro
 		Fragment fragment = null;
 		switch (position) {
 		case TICK_SCREEN_INDEX:
-			updateTicksScreen(true);
+			updateData(true);
 			break;
 		case OLDER_TICKS_INDEX:
 			getOlderKey();
 			mTweets = null;
 			updateTicksScreen(true);
-			break;
-		case SETTINGS_SCREEN_INDEX:
-			fragment = SettingsFragment.newInstance(getTick5Preferences().getString(Tick5Application.DEFAULT_FILTER_NAME_PREFERENCE, "cartoon"));
 			break;
 		case ABOUT_SCREEN_INDEX:
 			fragment = new AboutFragment();
@@ -378,7 +339,7 @@ public class MainActivity extends ActionBarActivity implements RobotoTypefacePro
 	}
 
 	private void updateTicksScreen(boolean presetCurrentPosition) {
-		if (mScreenIndex == SETTINGS_SCREEN_INDEX || mScreenIndex == ABOUT_SCREEN_INDEX) {
+		if (mScreenIndex == ABOUT_SCREEN_INDEX) {
 			return;
 		}
 		if (mTweets != null) {
